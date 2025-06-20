@@ -6,7 +6,7 @@ type { ToolAnnotations } from @modelcontextprotocol/sdk/types.js
 // Translates the input/output schema to a basic object type
 // Apparently Zod didn't have this feature, so I wrote this basic implementation
 // Maybe I should just use the `zod-to-json-schema` package? Not sure...
-type TInferedSchema<T> = {
+TInferedSchema<T> ::= {
   [K in keyof T]: T[K] extends ZodType ? z.infer<T[K]> : never
 }
 
