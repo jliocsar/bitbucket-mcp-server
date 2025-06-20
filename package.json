@@ -1,0 +1,24 @@
+{
+  "name": "bitbucket-mcp-server",
+  "version": "0.0.1",
+  "main": "index.civet",
+  "license": "MIT",
+  "scripts": {
+    "dev": "bun run --watch src/index.civet",
+    "inspect": "mcp-inspector bun src/index.civet"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
+    "bitbucket": "latest",
+    "zod": "latest"
+  },
+  "private": true,
+  "devDependencies": {
+    "@danielx/civet": "latest",
+    "@modelcontextprotocol/inspector": "latest",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

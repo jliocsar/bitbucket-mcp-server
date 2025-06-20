@@ -1,0 +1,29 @@
+{ parseArgs } from node:util
+{ exit } from node:process
+
+function printUsage()
+  console.error "Usage: bitbucket-mcp-server <username:password>"
+
+args := parseArgs {
+  +allowPositionals
+}
+positionalArgs := args.positionals
+
+unless positionalArgs# is 1 {
+  printUsage()
+  exit 1
+}
+
+[usernameAndPassword] := positionalArgs
+unless usernameAndPassword {
+  printUsage()
+  exit 1
+}
+
+[username, password] := usernameAndPassword.split ":"
+unless username and password {
+  printUsage()
+  exit 1
+}
+
+export getAuth := () -> ({ username, password })

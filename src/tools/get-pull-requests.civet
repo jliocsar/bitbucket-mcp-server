@@ -1,0 +1,47 @@
+{ z } from zod
+
+{ ToolDeclaration } from ../tool-declaration.civet
+
+export getPullRequestsTool := new ToolDeclaration {
+  name: "get-pull-requests",
+  config: {
+    title: "Get pull requests",
+    description: "Get all pull requests",
+    inputSchema: {
+      workspace: z.string(),
+      repository: z.string(),
+      fields: z.string().optional(),
+      page: z.string().optional(),
+      pagelen: z.number().optional(),
+      q: z.string().optional(),
+      sort: z.string().optional(),
+      state: z.enum(["OPEN", "MERGED", "DECLINED"]).optional()
+    },
+  },
+  run({ workspace, repository, fields, page, pagelen, q, sort, state }) {
+    try {
+      // Get the paginated pull requests
+      pullRequests := @bitbucket.repositories
+        |> .listPullRequests {
+          workspace,
+          repo_slug: repository,
+          fields,
+          page,
+          pagelen,
+          q,
+          sort,
+          state,
+        }
+        |> await
+        |> .data
+
+      // Return the pull requests
+      pullRequests
+    } catch (error) {
+      console.error error
+
+      // Return the error
+      error as Error
+    }
+  }
+}

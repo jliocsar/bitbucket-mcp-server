@@ -1,0 +1,42 @@
+{ McpServer } from @modelcontextprotocol/sdk/server/mcp.js
+{ StdioServerTransport } from @modelcontextprotocol/sdk/server/stdio.js
+
+* as tools from ./tools/index.civet
+
+// Create server
+server := new McpServer {
+  title: "Bitbucket MCP Server",
+  name: "bitbucket-mcp-server",
+  version: "1.0.0",
+  description: "Bitbucket MCP server",
+}
+
+// Register tools
+for toolDeclaration of Object.values tools {
+  { name, config, run } := toolDeclaration
+  server.registerTool(
+    name,
+    // TODO: Type this properly
+    config as any,
+    async (...args) -> {
+      // Run the tool
+      // @ts-expect-error -- Civet mistyping I guess?
+      result := await run.call(toolDeclaration, ...args)
+
+      // Return the result in the MCP format
+      ({
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify result,
+          },
+        ],
+      }) as const
+    }
+  )
+}
+
+// Start receiving messages on stdin and sending messages on stdout
+new StdioServerTransport()
+  |> server.connect
+  |> await

@@ -1,0 +1,37 @@
+{ z, type ZodType, type ZodRawShape } from zod
+type { ToolAnnotations } from @modelcontextprotocol/sdk/types.js
+
+{ bitbucket } from ./bitbucket.civet
+
+// Translates the input/output schema to a basic object type
+// Apparently Zod didn't have this feature, so I wrote this basic implementation
+// Maybe I should just use the `zod-to-json-schema` package? Not sure...
+type TInferedSchema<T> = {
+  [K in keyof T]: T[K] extends ZodType ? z.infer<T[K]> : never
+}
+
+// Wraps the tool declaration in a class to make it easier to use
+// For now some of the stuff is injected directly into this class (like `bitbucket`), but that
+// could change to be injected into the `run` function instead or something of the sort
+export class ToolDeclaration<TConfig extends {
+  title?: string
+  description?: string
+  inputSchema?: ZodRawShape extends infer TInputSchema ? TInputSchema : never
+  outputSchema?: ZodRawShape extends infer TOutputSchema ? TOutputSchema : never
+  annotations?: ToolAnnotations
+}> {
+  public readonly name: string
+  public readonly config: TConfig
+  public readonly run: (this: ToolDeclaration<TConfig>, args: TInferedSchema<TConfig["inputSchema"]>) -> any
+  protected readonly bitbucket = bitbucket
+
+  @(args: {
+    name: string
+    config: TConfig
+    run: (this: ToolDeclaration<TConfig>, args: TInferedSchema<TConfig["inputSchema"]>) -> any
+  }) {
+    @name = args.name
+    @config = args.config
+    @run = args.run.bind @
+  }
+}

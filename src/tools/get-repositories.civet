@@ -1,0 +1,43 @@
+{ z } from zod
+
+{ ToolDeclaration } from ../tool-declaration.civet
+
+export getRepositoriesTool := new ToolDeclaration {
+  name: "get-repositories",
+  config: {
+    title: "Get repositories",
+    description: "Get all repositories",
+    inputSchema: {
+      workspace: z.string(),
+      fields: z.string().optional(),
+      page: z.string().optional(),
+      pagelen: z.number().optional(),
+      q: z.string().optional(),
+      sort: z.string().optional(),
+    },
+  },
+  run({ workspace, fields, page, pagelen, q, sort }) {
+    try {
+      // Get the paginated repositories
+      repositories := @bitbucket.repositories
+        |> .list {
+          workspace,
+          fields,
+          page,
+          pagelen,
+          q,
+          sort,
+        }
+        |> await
+        |> .data
+
+      // Return the repositories
+      repositories
+    } catch (error) {
+      console.error error
+
+      // Return the error
+      error as Error
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{ z } from zod
+
+{ ToolDeclaration } from ../tool-declaration.civet
+
+export getRepositoryTool := new ToolDeclaration {
+  name: "get-repository",
+  config: {
+    title: "Get repository",
+    description: "Get a repository",
+    inputSchema: {
+      workspace: z.string(),
+      repository: z.string(),
+      fields: z.string().optional(),
+    },
+  },
+  run({ workspace, repository, fields }) {
+    try {
+      // Get the repository
+      repositoryData := @bitbucket.repositories
+        |> .get {
+          workspace,
+          repo_slug: repository,
+          fields,
+        }
+        |> await
+        |> .data
+
+      // Return the repository
+      repositoryData
+    } catch (error) {
+      console.error error
+
+      // Return the error
+      error as Error
+    }
+  }
+}

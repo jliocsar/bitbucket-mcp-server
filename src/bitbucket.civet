@@ -1,0 +1,7 @@
+{ Bitbucket } from bitbucket
+
+{ getAuth } from ./cli.civet
+
+export bitbucket := new Bitbucket {
+  auth: getAuth()
+}
