@@ -8,13 +8,15 @@ Written in Bun and Civet.
 
 ## Install
 
-First you will need `bun` installed locally:
+First clone this repository somewhere you'd like.
+
+Then, you will need `bun` installed locally:
 
 ```sh
 curl -fsSL https://bun.sh/install | bash
 ```
 
-Then in your MCP servers settings:
+Finally, add the `bitbucket-mcp-server` entry to your MCP servers settings:
 
 ```json
 {
