@@ -100,6 +100,7 @@ This will open the MCP Inspector with a GUI to play around and explore the MCP t
 ## To do
 
 - Write docs on the available tools
+- Decrease built binary file size
 
 ---
 
