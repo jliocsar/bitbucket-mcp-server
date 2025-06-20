@@ -37,7 +37,7 @@ export getPullRequestsTool := new ToolDeclaration {
 
       // Return the pull requests
       pullRequests
-    } catch (error) {
+    } catch error {
       console.error error
 
       // Return the error

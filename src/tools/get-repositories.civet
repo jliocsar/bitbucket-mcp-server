@@ -33,7 +33,7 @@ export getRepositoriesTool := new ToolDeclaration {
 
       // Return the repositories
       repositories
-    } catch (error) {
+    } catch error {
       console.error error
 
       // Return the error

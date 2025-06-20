@@ -36,7 +36,11 @@ for toolDeclaration of Object.values tools {
   )
 }
 
-// Start receiving messages on stdin and sending messages on stdout
-new StdioServerTransport()
-  |> server.connect
-  |> await
+main := -> {
+  // Start receiving messages on stdin and sending messages on stdout
+  new StdioServerTransport()
+    |> server.connect
+    |> await
+}
+
+main()

@@ -1,0 +1,44 @@
+{ $ } from bun
+fs from node:fs
+
+targets :=
+  . 'bun-linux-x64'
+  . 'bun-linux-arm64'
+  . 'bun-darwin-x64'
+  . 'bun-darwin-arm64'
+  . 'bun-windows-x64'
+outputDir := './dist'
+
+main := -> {
+  await Promise.all [
+    $`civet --js -c src/*.civet -o ./dist/.js`
+    $`civet --js -c src/tools/*.civet -o ./dist/tools/.js`
+  ]
+  
+  unless fs.existsSync outputDir {
+    fs.mkdirSync outputDir
+  }
+  
+  for target of targets {
+    console.info `Building for ${target}`
+
+    suffix := target.replace 'bun-', ''
+
+    try {
+      await $`bun build \
+        --compile \
+        --minify \
+        --sourcemap \
+        --bytecode \
+        --target=${target} \
+        ./dist/index.js \
+        --outfile ${outputDir}/bitbucket-mcp-server-${suffix}`
+      
+      console.info `Built for ${target}`
+    } catch error {
+      console.error `Error building for ${target}: ${error}`
+    }
+  }
+}
+
+main()

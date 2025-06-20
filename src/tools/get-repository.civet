@@ -27,7 +27,7 @@ export getRepositoryTool := new ToolDeclaration {
 
       // Return the repository
       repositoryData
-    } catch (error) {
+    } catch error {
       console.error error
 
       // Return the error

@@ -52,7 +52,7 @@ export getPullRequestTool := new ToolDeclaration {
 
       // Return the pull request
       outputResult.data
-    } catch (error) {
+    } catch error {
       console.error error
 
       // Return the error

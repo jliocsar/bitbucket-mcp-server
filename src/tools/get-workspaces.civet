@@ -31,7 +31,7 @@ export getWorkspacesTool := new ToolDeclaration {
 
       // Return the workspaces
       workspaces
-    } catch (error) {
+    } catch error {
       console.error error
 
       // Return the error
