@@ -1,5 +1,7 @@
 # 🌬️ bitbucket-mcp-server
 
+[![Bun][bun-badge]](https://bun.sh/)
+[![Bitbucket][bitbucket-badge]](https://www.npmjs.com/package/bitbucket)
 [![deployment](https://github.com/jliocsar/bitbucket-mcp-server/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/jliocsar/bitbucket-mcp-server/actions/workflows/release.yml)
 
 Simple MCP implementation for (mostly) pull requests on Bitbucket.
@@ -121,4 +123,6 @@ This will open the MCP Inspector with a GUI to play around and explore the MCP t
 
 This project was created using `bun init` in bun v1.2.17. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
 
+[bitbucket-badge]: https://img.shields.io/badge/bitbucket-blue?logo=bitbucket&color=0052CC
+[bun-badge]: https://img.shields.io/badge/bun.sh-black?logo=bun&color=000000
 [bitbucket-mcp-server-releases]: https://github.com/jliocsar/bitbucket-mcp-server/releases
