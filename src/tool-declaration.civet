@@ -1,5 +1,9 @@
+{ Glob } from bun
+path from node:path
+
 { z, type ZodType, type ZodRawShape, type Primitive } from zod
 type { ToolAnnotations, ServerRequest, ServerNotification } from @modelcontextprotocol/sdk/types.js
+type { McpServer } from @modelcontextprotocol/sdk/server/mcp.js
 type { RequestHandlerExtra } from @modelcontextprotocol/sdk/shared/protocol.js
 
 // Translates the input/output schema to a basic object type
@@ -44,4 +48,53 @@ export class ToolDeclaration<TConfig extends ToolDeclarationConfig = ToolDeclara
     @config = args.config
     @run = args.run.bind(@ as any)
   }
+}
+
+safeActionCallToOutput := <T extends ToolDeclaration>(member: T) ->
+  (...args: Parameters<ToolDeclarationRunCallback>) ->
+    content: []
+      type: "text",
+      text: (
+        try
+          await member.run.apply member, args
+        catch actionError error: (actionError as Error).message
+      )
+        |> JSON.stringify
+
+// All tools are loaded via a glob scan, so we can just iterate over the files and import them
+// This means to create new tools you just need to create a new file in `src/tools`
+export registerTools := (server: McpServer) -> {
+  // Prepare to register tools
+  { dirname } := import.meta
+  civetGlob := new Glob "**/*.civet"
+  toolsPath := path.join dirname, 'tools'
+
+  // Register tools based on the glob pattern
+  for await file of civetGlob.scan toolsPath {
+    // Import the tool declaration module file
+    absoluteToolPath := path.join toolsPath, file
+    toolDeclarationModule := await import absoluteToolPath
+    toolDeclarationModuleExportedMembers := Object.values toolDeclarationModule
+    
+    // For each exported member, if it's a tool declaration, register it with the server
+    for member of toolDeclarationModuleExportedMembers {
+      // Filter out exports that aren't tool declarations
+      unless member instanceof ToolDeclaration {
+        continue
+      }
+
+      // Register the tool with the server
+      server.registerTool(
+        member.name,
+        member.config,
+        // Wrap the run call in a try/catch and return the result in the MCP format
+        // @ts-expect-error -- The types are all right here, but the SDK won't know that a `Promise` of the
+        // `ToolCallback` is a valid `ToolCallback` (because promises are flattened)
+        safeActionCallToOutput member
+      )
+    }
+  }
+  
+  // Return the server to allow for chaining
+  server
 }

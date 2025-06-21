@@ -1,7 +1,7 @@
 { parseArgs } from node:util
 { exit } from node:process
 
-function printUsage()
+printUsage := () ->
   console.error "Usage: bitbucket-mcp-server <username:password>"
 
 args := parseArgs {
