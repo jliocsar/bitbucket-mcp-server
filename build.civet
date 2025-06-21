@@ -10,37 +10,41 @@ targets :=
   . 'bun-windows-x64'
 outputDir := './dist'
 
-// Transpile all Civet source files to JS
-await Promise.all [
-  $`civet --js -c src/*.civet -o ./dist/.js`
-  $`civet --js -c src/tools/*.civet -o ./dist/tools/.js`
-]
+// FIXME: Why does this have to be in a function
+main := -> {
+  // Transpile all Civet source files to JS
+  await Promise.all [
+    $`civet --js -c src/*.civet -o ./dist/.js`
+    $`civet --js -c src/tools/*.civet -o ./dist/tools/.js`
+  ]
 
-// Create the output directory if it doesn't exist
-unless fs.existsSync outputDir {
-  fs.mkdirSync outputDir
-}
+  // Create the output directory if it doesn't exist
+  unless fs.existsSync outputDir {
+    fs.mkdirSync outputDir
+  }
 
-// Build the binary for each target
-for target of targets {
-  console.info `Building for ${target}`
+  // Build the binary for each target
+  for target of targets {
+    console.info `Building for ${target}`
 
-  // Remove the `bun-` prefix from the output filename
-  suffix := target.replace 'bun-', ''
+    // Remove the `bun-` prefix from the output filename
+    suffix := target.replace 'bun-', ''
 
-  // Build the binary
-  try {
-    await $`bun build \
-      --compile \
-      --minify \
-      --sourcemap \
-      --bytecode \
-      --target=${target} \
-      ./dist/index.js \
-      --outfile ${outputDir}/bitbucket-mcp-server-${suffix}`
-    
-    console.info `Built for ${target}`
-  } catch error {
-    console.error `Error building for ${target}: ${error}`
+    // Build the binary
+    try {
+      await $`bun build \
+        --compile \
+        --minify \
+        --sourcemap \
+        --target=${target} \
+        ./dist/index.js \
+        --outfile ${outputDir}/bitbucket-mcp-server-${suffix}`
+      
+      console.info `Built for ${target}`
+    } catch error {
+      console.error `Error building for ${target}: ${error}`
+    }
   }
 }
+
+main()

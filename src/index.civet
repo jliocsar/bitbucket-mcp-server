@@ -4,23 +4,27 @@
 { registerTools } from ./tool-declaration.civet
 { logger } from ./logger.civet
 
-// Create server
-server := new McpServer {
-  title: "Bitbucket MCP Server",
-  name: "bitbucket-mcp-server",
-  version: "1.0.0",
-  description: "Bitbucket MCP server",
+main := -> {
+  // Create server
+  server := new McpServer {
+    title: "Bitbucket MCP Server",
+    name: "bitbucket-mcp-server",
+    version: "1.0.0",
+    description: "Bitbucket MCP server",
+  }
+    // Register the available tools
+    |> registerTools
+    |> await
+
+  // Create a transport to listen for messages on stdin and send messages on stdout
+  transport := new StdioServerTransport()
+
+  // Start receiving messages on stdin and sending messages on stdout
+  transport
+    |> server.connect
+    |> await
+
+  logger.info "Server started"
 }
-  // Register the available tools
-  |> registerTools
-  |> await
 
-// Create a transport to listen for messages on stdin and send messages on stdout
-transport := new StdioServerTransport()
-
-// Start receiving messages on stdin and sending messages on stdout
-transport
-  |> server.connect
-  |> await
-
-logger.info "Server started"
+main()
