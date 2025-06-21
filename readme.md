@@ -27,6 +27,8 @@ Then there are 2 ways to run it locally:
 
 To run from the pre-built binaries, go to the [Releases][bitbucket-mcp-server-releases] page and get the latest release from there.
 
+Extract the binary somewhere you'd like.
+
 Then, add this to your MCP servers settings:
 
 ```jsonc

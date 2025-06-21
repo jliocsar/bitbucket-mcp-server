@@ -21,7 +21,8 @@
   "devDependencies": {
     "@danielx/civet": "latest",
     "@modelcontextprotocol/inspector": "latest",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "tar": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"

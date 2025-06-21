@@ -1,6 +1,8 @@
 { $ } from bun
 fs from node:fs
 
+* as tar from tar
+
 // Build configuration
 targets :=
   . 'bun-linux-x64'
@@ -24,11 +26,12 @@ main := -> {
   }
 
   // Build the binary for each target
-  for target of targets {
+  await Promise.all targets.map (target) -> {
     console.info `Building for ${target}`
 
     // Remove the `bun-` prefix from the output filename
     suffix := target.replace 'bun-', ''
+    outfile := `${outputDir}/bitbucket-mcp-server-${suffix}`
 
     // Build the binary
     try {
@@ -38,8 +41,19 @@ main := -> {
         --sourcemap \
         --target=${target} \
         ./dist/index.js \
-        --outfile ${outputDir}/bitbucket-mcp-server-${suffix}`
-      
+        --outfile ${outfile}`
+
+      outputFileName := outfile.includes('windows') ? `${outfile}.exe` : outfile
+
+      // Create a tarball of the binary
+      await tar.create {
+        +gzip
+        file: `${outfile}.tar.gz`
+      }, [outputFileName]
+
+      // Remove the binary
+      fs.unlinkSync outputFileName
+
       console.info `Built for ${target}`
     } catch error {
       console.error `Error building for ${target}: ${error}`
