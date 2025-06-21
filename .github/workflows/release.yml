@@ -10,13 +10,12 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    uses: ./.github/actions/setup
     steps:
-      - uses: ./.github/actions/setup
       - run: bun run test
   build:
     name: Build
     runs-on: ubuntu-latest
+    uses: ./.github/actions/setup
     steps:
-      - uses: ./.github/actions/setup
-      - run: |
-          bun run build && ls ${{ github.workspace }}
+      - run: bun run build && ls ${{ github.workspace }}
