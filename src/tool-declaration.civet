@@ -1,11 +1,15 @@
-{ z, type ZodType, type ZodRawShape } from zod
-type { ToolAnnotations } from @modelcontextprotocol/sdk/types.js
+{ z, type ZodType, type ZodRawShape, type Primitive } from zod
+type { ToolAnnotations, ServerRequest, ServerNotification } from @modelcontextprotocol/sdk/types.js
+type { RequestHandlerExtra } from @modelcontextprotocol/sdk/shared/protocol.js
 
 // Translates the input/output schema to a basic object type
 // Apparently Zod didn't have this feature, so I wrote this basic implementation
 // Maybe I should just use the `zod-to-json-schema` package? Not sure...
-TInferedSchema<T> ::= {
+export TInferedSchema<T> ::= {
   [K in keyof T]: T[K] extends ZodType ? z.infer<T[K]> : never
+}
+export TSerializable<T> ::= {
+  [K in keyof T]: Primitive | TSerializable<T[K]> | TSerializable<T[K]>[]
 }
 
 export ToolDeclarationConfig ::= {
@@ -16,10 +20,12 @@ export ToolDeclarationConfig ::= {
   annotations?: ToolAnnotations
 }
 
-ToolDeclarationRunCallback<TConfig extends ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any> ::=
-  (@: ToolDeclaration<TConfig, TConstructor> & InstanceType<TConstructor>, args: TInferedSchema<TConfig["inputSchema"]>) -> any
+export ToolDeclarationRunCallback<TConfig extends ToolDeclarationConfig = ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any = new () => any> ::=
+  (@: ToolDeclaration<TConfig, TConstructor> & InstanceType<TConstructor>, args: TInferedSchema<TConfig["inputSchema"]>, extra: RequestHandlerExtra<ServerRequest, ServerNotification>) -> Promise<
+    TSerializable<TInferedSchema<TConfig["outputSchema"]>> | TSerializable<TInferedSchema<TConfig["outputSchema"]>>[] | null
+  >
 
-export ToolDeclarationArgs<TConfig extends ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any> ::= {
+export ToolDeclarationArgs<TConfig extends ToolDeclarationConfig = ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any = new () => any> ::= {
   name: string
   config: TConfig
   run: ToolDeclarationRunCallback<TConfig, TConstructor>

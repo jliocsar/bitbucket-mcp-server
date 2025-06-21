@@ -14,24 +14,17 @@ export getRepositoryTool := new BitbucketToolDeclaration {
     },
   },
   run({ workspace, repository, fields }) {
-    try {
-      // Get the repository
-      repositoryData := @bitbucket.repositories
-        |> .get {
-          workspace,
-          repo_slug: repository,
-          fields,
-        }
-        |> await
-        |> .data
+    // Get the repository
+    repositoryData := @bitbucket.repositories
+      |> .get {
+        workspace,
+        repo_slug: repository,
+        fields,
+      }
+      |> await
+      |> .data
 
-      // Return the repository
-      repositoryData
-    } catch error {
-      console.error error
-
-      // Return the error
-      error as Error
-    }
+    // Return the repository
+    repositoryData
   }
 }

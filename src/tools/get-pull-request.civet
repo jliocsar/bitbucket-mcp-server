@@ -18,45 +18,38 @@ export getPullRequestTool := new BitbucketToolDeclaration {
     },
   },
   run({ pullRequestId, repository, workspace, fields }) {
-    try {
-      // Define the output schema for the get pull request tool
-      getPullRequestOutputSchema := z.object {
-        title: z.string(),
-        description: z.string(),
-        diff: z.string(),
-      }
-
-      // Define the parameters for the get pull request and get pull request diff actions
-      pullRequestParams := {
-        pull_request_id: pullRequestId,
-        repo_slug: repository,
-        workspace,
-        fields,
-      } as const satisfies Params.RepositoriesGetPullRequest;
-
-      // Get the pull request and pull request diff
-      [pullRequest, pullRequestDiff] := Promise.all [
-        @bitbucket.repositories.getPullRequest(pullRequestParams),
-        @bitbucket.repositories.getPullRequestDiff(pullRequestParams),
-      ]
-        |> await
-        |> .map .data
-
-      // Assert the pull request output is valid
-      outputResult := getPullRequestOutputSchema.safeParse {
-        pullRequest.title,
-        pullRequest.description,
-        diff: pullRequestDiff,
-      }
-      assert outputResult.success, "Invalid output"
-
-      // Return the pull request
-      outputResult.data
-    } catch error {
-      console.error error
-
-      // Return the error
-      error as Error
+    // Define the output schema for the get pull request tool
+    getPullRequestOutputSchema := z.object {
+      title: z.string(),
+      description: z.string(),
+      diff: z.string(),
     }
+
+    // Define the parameters for the get pull request and get pull request diff actions
+    pullRequestParams := {
+      pull_request_id: pullRequestId,
+      repo_slug: repository,
+      workspace,
+      fields,
+    } as const satisfies Params.RepositoriesGetPullRequest;
+
+    // Get the pull request and pull request diff
+    [pullRequest, pullRequestDiff] := Promise.all [
+      @bitbucket.repositories.getPullRequest(pullRequestParams),
+      @bitbucket.repositories.getPullRequestDiff(pullRequestParams),
+    ]
+      |> await
+      |> .map .data
+
+    // Assert the pull request output is valid
+    outputResult := getPullRequestOutputSchema.safeParse {
+      pullRequest.title,
+      pullRequest.description,
+      diff: pullRequestDiff,
+    }
+    assert outputResult.success, "Invalid output"
+
+    // Return the pull request
+    outputResult.data
   }
 }

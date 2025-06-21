@@ -17,27 +17,20 @@ export getRepositoriesTool := new BitbucketToolDeclaration {
     },
   },
   run({ workspace, fields, page, pagelen, q, sort }) {
-    try {
-      // Get the paginated repositories
-      repositories := @bitbucket.repositories
-        |> .list {
-          workspace,
-          fields,
-          page,
-          pagelen,
-          q,
-          sort,
-        }
-        |> await
-        |> .data
+    // Get the paginated repositories
+    repositories := @bitbucket.repositories
+      |> .list {
+        workspace,
+        fields,
+        page,
+        pagelen,
+        q,
+        sort,
+      }
+      |> await
+      |> .data
 
-      // Return the repositories
-      repositories
-    } catch error {
-      console.error error
-
-      // Return the error
-      error as Error
-    }
+    // Return the repositories
+    repositories
   }
 }

@@ -1,6 +1,7 @@
 { $ } from bun
 fs from node:fs
 
+// Build configuration
 targets :=
   . 'bun-linux-x64'
   . 'bun-linux-arm64'
@@ -9,36 +10,37 @@ targets :=
   . 'bun-windows-x64'
 outputDir := './dist'
 
-main := -> {
-  await Promise.all [
-    $`civet --js -c src/*.civet -o ./dist/.js`
-    $`civet --js -c src/tools/*.civet -o ./dist/tools/.js`
-  ]
-  
-  unless fs.existsSync outputDir {
-    fs.mkdirSync outputDir
-  }
-  
-  for target of targets {
-    console.info `Building for ${target}`
+// Transpile all Civet source files to JS
+await Promise.all [
+  $`civet --js -c src/*.civet -o ./dist/.js`
+  $`civet --js -c src/tools/*.civet -o ./dist/tools/.js`
+]
 
-    suffix := target.replace 'bun-', ''
-
-    try {
-      await $`bun build \
-        --compile \
-        --minify \
-        --sourcemap \
-        --bytecode \
-        --target=${target} \
-        ./dist/index.js \
-        --outfile ${outputDir}/bitbucket-mcp-server-${suffix}`
-      
-      console.info `Built for ${target}`
-    } catch error {
-      console.error `Error building for ${target}: ${error}`
-    }
-  }
+// Create the output directory if it doesn't exist
+unless fs.existsSync outputDir {
+  fs.mkdirSync outputDir
 }
 
-main()
+// Build the binary for each target
+for target of targets {
+  console.info `Building for ${target}`
+
+  // Remove the `bun-` prefix from the output filename
+  suffix := target.replace 'bun-', ''
+
+  // Build the binary
+  try {
+    await $`bun build \
+      --compile \
+      --minify \
+      --sourcemap \
+      --bytecode \
+      --target=${target} \
+      ./dist/index.js \
+      --outfile ${outputDir}/bitbucket-mcp-server-${suffix}`
+    
+    console.info `Built for ${target}`
+  } catch error {
+    console.error `Error building for ${target}: ${error}`
+  }
+}

@@ -19,29 +19,22 @@ export getPullRequestsTool := new BitbucketToolDeclaration {
     },
   },
   run({ workspace, repository, fields, page, pagelen, q, sort, state }) {
-    try {
-      // Get the paginated pull requests
-      pullRequests := @bitbucket.repositories
-        |> .listPullRequests {
-          workspace,
-          repo_slug: repository,
-          fields,
-          page,
-          pagelen,
-          q,
-          sort,
-          state,
-        }
-        |> await
-        |> .data
+    // Get the paginated pull requests
+    pullRequests := @bitbucket.repositories
+      |> .listPullRequests {
+        workspace,
+        repo_slug: repository,
+        fields,
+        page,
+        pagelen,
+        q,
+        sort,
+        state,
+      }
+      |> await
+      |> .data
 
-      // Return the pull requests
-      pullRequests
-    } catch error {
-      console.error error
-
-      // Return the error
-      error as Error
-    }
+    // Return the pull requests
+    pullRequests
   }
 }

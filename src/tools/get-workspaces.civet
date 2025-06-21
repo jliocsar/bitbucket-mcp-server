@@ -16,26 +16,19 @@ export getWorkspacesTool := new BitbucketToolDeclaration {
     },
   },
   run({ fields, page, pagelen, q, sort }) {
-    try {
-      // Get the paginated workspaces
-      workspaces := @bitbucket.workspaces
-        |> .getWorkspaces {
-          fields,
-          page,
-          pagelen,
-          q,
-          sort,
-        }
-        |> await
-        |> .data
+    // Get the paginated workspaces
+    workspaces := @bitbucket.workspaces
+      |> .getWorkspaces {
+        fields,
+        page,
+        pagelen,
+        q,
+        sort,
+      }
+      |> await
+      |> .data
 
-      // Return the workspaces
-      workspaces
-    } catch error {
-      console.error error
-
-      // Return the error
-      error as Error
-    }
+    // Return the workspaces
+    workspaces
   }
 }
