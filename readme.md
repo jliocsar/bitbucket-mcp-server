@@ -103,6 +103,7 @@ This will open the MCP Inspector with a GUI to play around and explore the MCP t
 - Decrease built binary file size
 - Change tools registering to be file system based (i.e. glob import)
   - This way new tools can be created just by adding a new file to the code base.
+- Github action for build and tests
 
 ---
 
