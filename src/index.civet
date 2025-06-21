@@ -1,6 +1,8 @@
 { McpServer } from @modelcontextprotocol/sdk/server/mcp.js
 { StdioServerTransport } from @modelcontextprotocol/sdk/server/stdio.js
 
+* as tools from ./tools/index.civet
+
 { registerTools } from ./tool-declaration.civet
 { logger } from ./logger.civet
 
@@ -13,7 +15,7 @@ main := -> {
     description: "Bitbucket MCP server",
   }
     // Register the available tools
-    |> registerTools
+    |> registerTools tools
     |> await
 
   // Create a transport to listen for messages on stdin and send messages on stdout

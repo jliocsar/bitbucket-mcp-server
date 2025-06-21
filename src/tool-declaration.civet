@@ -1,6 +1,3 @@
-{ Glob } from bun
-path from node:path
-
 { z, type ZodType, type ZodRawShape, type Primitive } from zod
 type { ToolAnnotations, ServerRequest, ServerNotification } from @modelcontextprotocol/sdk/types.js
 type { McpServer } from @modelcontextprotocol/sdk/server/mcp.js
@@ -17,15 +14,19 @@ export TSerializable<T> ::= {
 }
 
 export ToolDeclarationConfig ::= {
-  title?: string
-  description?: string
-  inputSchema?: ZodRawShape extends infer TInputSchema ? TInputSchema : never
+  title: string
+  description: string
+  inputSchema: ZodRawShape extends infer TInputSchema ? TInputSchema : never
   outputSchema?: ZodRawShape extends infer TOutputSchema ? TOutputSchema : never
   annotations?: ToolAnnotations
 }
 
 export ToolDeclarationRunCallback<TConfig extends ToolDeclarationConfig = ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any = new () => any> ::=
-  (@: ToolDeclaration<TConfig, TConstructor> & InstanceType<TConstructor>, args: TInferedSchema<TConfig["inputSchema"]>, extra: RequestHandlerExtra<ServerRequest, ServerNotification>) -> Promise<
+  (
+    @: ToolDeclaration<TConfig, TConstructor> & InstanceType<TConstructor>,
+    args: TInferedSchema<TConfig["inputSchema"] extends infer TInputSchema ? TInputSchema : never>,
+    extra: RequestHandlerExtra<ServerRequest, ServerNotification>
+  ) -> Promise<
     TSerializable<TInferedSchema<TConfig["outputSchema"]>> | TSerializable<TInferedSchema<TConfig["outputSchema"]>>[] | null
   >
 
@@ -63,36 +64,24 @@ safeActionCallToOutput := <T extends ToolDeclaration>(member: T) ->
 
 // All tools are loaded via a glob scan, so we can just iterate over the files and import them
 // This means to create new tools you just need to create a new file in `src/tools`
-export registerTools := (server: McpServer) -> {
-  // Prepare to register tools
-  { dirname } := import.meta
-  civetGlob := new Glob "**/*.civet"
-  toolsPath := path.join dirname, 'tools'
-
+export registerTools := <TConfig extends ToolDeclarationConfig, T extends ToolDeclaration<TConfig>>(tools: Record<string, T>) -> (server: McpServer) -> {
   // Register tools based on the glob pattern
-  for await file of civetGlob.scan toolsPath {
-    // Import the tool declaration module file
-    absoluteToolPath := path.join toolsPath, file
-    toolDeclarationModule := await import absoluteToolPath
-    toolDeclarationModuleExportedMembers := Object.values toolDeclarationModule
-    
+  for await member of Object.values tools {
     // For each exported member, if it's a tool declaration, register it with the server
-    for member of toolDeclarationModuleExportedMembers {
-      // Filter out exports that aren't tool declarations
-      unless member instanceof ToolDeclaration {
-        continue
-      }
-
-      // Register the tool with the server
-      server.registerTool(
-        member.name,
-        member.config,
-        // Wrap the run call in a try/catch and return the result in the MCP format
-        // @ts-expect-error -- The types are all right here, but the SDK won't know that a `Promise` of the
-        // `ToolCallback` is a valid `ToolCallback` (because promises are flattened)
-        safeActionCallToOutput member
-      )
+    // Filter out exports that aren't tool declarations
+    unless member instanceof ToolDeclaration {
+      continue
     }
+
+    // Register the tool with the server
+    server.registerTool(
+      member.name,
+      member.config,
+      // Wrap the run call in a try/catch and return the result in the MCP format
+      // @ts-expect-error -- The types are all right here, but the SDK won't know that a `Promise` of the
+      // `ToolCallback` is a valid `ToolCallback` (because promises are flattened)
+      safeActionCallToOutput member
+    )
   }
   
   // Return the server to allow for chaining

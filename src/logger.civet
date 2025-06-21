@@ -1,6 +1,6 @@
 pino from pino
 
-{ NODE_ENV = "development" } := process.env
+{ NODE_ENV } := process.env
 
 export logger := pino {
   ...(if NODE_ENV is "development" then {
