@@ -36,7 +36,7 @@ Then, add this to your MCP servers settings:
 }
 ```
 
-Afterwards you should already be able to us
+This is enough to get the server going.
 
 ### Bun/Build
 
@@ -46,6 +46,12 @@ First you will need `bun` installed locally:
 
 ```sh
 curl -fsSL https://bun.sh/install | bash
+```
+
+Then from the project directory install all dependencies with:
+
+```sh
+bun i
 ```
 
 #### Running with Bun
