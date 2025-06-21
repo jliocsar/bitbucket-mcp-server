@@ -1,5 +1,7 @@
 # 🌬️ bitbucket-mcp-server
 
+[![deployment](https://github.com/jliocsar/bitbucket-mcp-server/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/jliocsar/bitbucket-mcp-server/actions/workflows/release.yml)
+
 Simple MCP implementation for (mostly) pull requests on Bitbucket.
 
 Provide context from your PRs to your favorite LLM and let it review them for you!
