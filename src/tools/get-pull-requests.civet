@@ -1,8 +1,8 @@
 { z } from zod
 
-{ ToolDeclaration } from ../tool-declaration.civet
+{ BitbucketToolDeclaration } from ../bitbucket.civet
 
-export getPullRequestsTool := new ToolDeclaration {
+export getPullRequestsTool := new BitbucketToolDeclaration {
   name: "get-pull-requests",
   config: {
     title: "Get pull requests",

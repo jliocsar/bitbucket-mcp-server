@@ -1,8 +1,8 @@
 { z } from zod
 
-{ ToolDeclaration } from ../tool-declaration.civet
+{ BitbucketToolDeclaration } from ../bitbucket.civet
 
-export getWorkspacesTool := new ToolDeclaration {
+export getWorkspacesTool := new BitbucketToolDeclaration {
   name: "get-workspaces",
   config: {
     title: "Get workspaces",

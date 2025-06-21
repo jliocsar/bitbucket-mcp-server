@@ -1,8 +1,6 @@
 { z, type ZodType, type ZodRawShape } from zod
 type { ToolAnnotations } from @modelcontextprotocol/sdk/types.js
 
-{ bitbucket } from ./bitbucket.civet
-
 // Translates the input/output schema to a basic object type
 // Apparently Zod didn't have this feature, so I wrote this basic implementation
 // Maybe I should just use the `zod-to-json-schema` package? Not sure...
@@ -10,28 +8,34 @@ TInferedSchema<T> ::= {
   [K in keyof T]: T[K] extends ZodType ? z.infer<T[K]> : never
 }
 
-// Wraps the tool declaration in a class to make it easier to use
-// For now some of the stuff is injected directly into this class (like `bitbucket`), but that
-// could change to be injected into the `run` function instead or something of the sort
-export class ToolDeclaration<TConfig extends {
+export ToolDeclarationConfig ::= {
   title?: string
   description?: string
   inputSchema?: ZodRawShape extends infer TInputSchema ? TInputSchema : never
   outputSchema?: ZodRawShape extends infer TOutputSchema ? TOutputSchema : never
   annotations?: ToolAnnotations
-}> {
+}
+
+ToolDeclarationRunCallback<TConfig extends ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any> ::=
+  (@: ToolDeclaration<TConfig, TConstructor> & InstanceType<TConstructor>, args: TInferedSchema<TConfig["inputSchema"]>) -> any
+
+export ToolDeclarationArgs<TConfig extends ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any> ::= {
+  name: string
+  config: TConfig
+  run: ToolDeclarationRunCallback<TConfig, TConstructor>
+}
+
+// Wraps the tool declaration in a class to make it easier to use
+// For now some of the stuff is injected directly into this class (like `bitbucket`), but that
+// could change to be injected into the `run` function instead or something of the sort
+export class ToolDeclaration<TConfig extends ToolDeclarationConfig = ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any = new () => any> {
   public readonly name: string
   public readonly config: TConfig
-  public readonly run: (this: ToolDeclaration<TConfig>, args: TInferedSchema<TConfig["inputSchema"]>) -> any
-  protected readonly bitbucket = bitbucket
+  public readonly run: ToolDeclarationRunCallback<TConfig, TConstructor>
 
-  @(args: {
-    name: string
-    config: TConfig
-    run: (this: ToolDeclaration<TConfig>, args: TInferedSchema<TConfig["inputSchema"]>) -> any
-  }) {
+  @(args: ToolDeclarationArgs<TConfig, TConstructor>) {
     @name = args.name
     @config = args.config
-    @run = args.run.bind @
+    @run = args.run.bind(@ as any)
   }
 }

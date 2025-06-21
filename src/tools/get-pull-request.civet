@@ -3,9 +3,9 @@ assert from node:assert
 { z } from zod
 type { Params } from bitbucket/lib/bitbucket
 
-{ ToolDeclaration } from ../tool-declaration.civet
+{ BitbucketToolDeclaration } from ../bitbucket.civet
 
-export getPullRequestTool := new ToolDeclaration {
+export getPullRequestTool := new BitbucketToolDeclaration {
   name: "get-pull-request",
   config: {
     title: "Get pull request",

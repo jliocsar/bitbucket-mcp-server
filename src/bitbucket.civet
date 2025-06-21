@@ -1,7 +1,12 @@
 { Bitbucket } from bitbucket
 
 { getAuth } from ./cli.civet
+{ ToolDeclaration, type ToolDeclarationConfig } from ./tool-declaration.civet
 
 export bitbucket := new Bitbucket {
   auth: getAuth()
+}
+
+export class BitbucketToolDeclaration<TConfig extends ToolDeclarationConfig> extends ToolDeclaration<TConfig, typeof BitbucketToolDeclaration> {
+  readonly bitbucket = bitbucket
 }
