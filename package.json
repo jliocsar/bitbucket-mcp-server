@@ -8,7 +8,8 @@
     "dev": "NODE_ENV=development bun run --watch src/index.civet",
     "inspect": "NODE_ENV=development mcp-inspector bun src/index.civet",
     "build": "bun run build.civet",
-    "start": "./dist/bitbucket-mcp-server"
+    "start": "./dist/bitbucket-mcp-server",
+    "test": "echo 'No tests to run'"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
