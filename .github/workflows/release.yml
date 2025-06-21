@@ -18,6 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/actions/setup
-      - run: bun run build
-        run: |
-          ls ${{ github.workspace }}
+      - run: |
+        bun run build &&
+        ls ${{ github.workspace }}
