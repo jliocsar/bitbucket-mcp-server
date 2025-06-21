@@ -1,0 +1,30 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export getRepositoryCommitTool := new BitbucketToolDeclaration {
+  name: "get-repository-commit",
+  config: {
+    title: "Get repository commit",
+    description: "Get a repository commit",
+    inputSchema: {
+      workspace: z.string(),
+      repository: z.string(),
+      commit: z.string(),
+    },
+  },
+  run({ workspace, repository, commit }) {
+    // Get the repository commit
+    commitData := @bitbucket.repositories
+      |> .getCommit {
+        workspace,
+        repo_slug: repository,
+        commit,
+      }
+      |> await
+      |> .data
+
+    // Return the repository commit
+    commitData
+  }
+}

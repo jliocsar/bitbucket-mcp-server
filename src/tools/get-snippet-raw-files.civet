@@ -1,0 +1,32 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export getSnippetRawFilesTool := new BitbucketToolDeclaration {
+  name: "get-snippet-raw-files",
+  config: {
+    title: "Get snippet raw files",
+    description: "Get raw files",
+    inputSchema: {
+      workspace: z.string(),
+      fields: z.string().optional(),
+      encodedId: z.string(),
+      path: z.string(),
+    },
+  },
+  run({ workspace, fields, encodedId, path }) {
+    // Get the raw files
+    rawFiles := @bitbucket.snippet
+      |> .getRawFiles {
+        encoded_id: encodedId,
+        path,
+        workspace,
+        fields,
+      }
+      |> await
+      |> .data
+
+    // Return the raw files
+    rawFiles
+  }
+}

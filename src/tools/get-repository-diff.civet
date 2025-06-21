@@ -1,0 +1,47 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export getRepositoryDiffTool := new BitbucketToolDeclaration {
+  name: "get-repository-diff",
+  config: {
+    title: "Get repository diff",
+    description: "Get a repository diff",
+    inputSchema: {
+      workspace: z.string(),
+      repository: z.string(),
+      spec: z.string(),
+      pullRequestId: z.number(),
+      binary: z.boolean().optional(),
+      context: z.number().optional(),
+      fields: z.string().optional(),
+      ignoreWhitespace: z.boolean().optional(),
+      merge: z.boolean().optional(),
+      path: z.string().optional(),
+      renames: z.boolean().optional(),
+      topic: z.boolean().optional(),
+    },
+  },
+  run({ workspace, repository, spec, binary, context, fields, ignoreWhitespace, merge, path, renames, topic }) {
+    // Get the repository diff
+    repositoryDiff := @bitbucket.repositories
+      |> .getDiff {
+        workspace,
+        repo_slug: repository,
+        spec,
+        binary,
+        context,
+        fields,
+        ignore_whitespace: ignoreWhitespace,
+        merge,
+        path,
+        renames,
+        topic,
+      }
+      |> await
+      |> .data
+
+    // Return the repository diff
+    repositoryDiff
+  }
+}

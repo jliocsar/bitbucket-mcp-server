@@ -2,11 +2,11 @@
 
 { BitbucketToolDeclaration } from ../bitbucket.civet
 
-export getPullRequestTool := new BitbucketToolDeclaration {
-  name: "get-pull-request",
+export getPullRequestDiffTool := new BitbucketToolDeclaration {
+  name: "get-pull-request-diff",
   config: {
-    title: "Get pull request",
-    description: "Get a pull request",
+    title: "Get pull request diff",
+    description: "Get a pull request diff",
     inputSchema: {
       pullRequestId: z.number(),
       repository: z.string(),
@@ -15,8 +15,9 @@ export getPullRequestTool := new BitbucketToolDeclaration {
     },
   },
   run({ pullRequestId, repository, workspace, fields }) {
-    pullRequest := @bitbucket.pullrequests
-      |> .get {
+    // Get the pull request diff
+    pullRequestDiff := @bitbucket.pullrequests
+      |> .getDiff {
         pull_request_id: pullRequestId,
         repo_slug: repository,
         workspace,
@@ -25,7 +26,7 @@ export getPullRequestTool := new BitbucketToolDeclaration {
       |> await
       |> .data
 
-    // Return the pull request
-    pullRequest
+    // Return the pull request diff
+    pullRequestDiff
   }
 }

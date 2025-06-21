@@ -1,0 +1,43 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export listCommitsTool := new BitbucketToolDeclaration {
+  name: "list-commits",
+  config: {
+    title: "List commits",
+    description: "List commits",
+    inputSchema: {
+      workspace: z.string(),
+      repository: z.string(),
+      branch: z.string().optional(),
+      page: z.string().optional(),
+      pagelen: z.number().optional(),
+      q: z.string().optional(),
+      sort: z.string().optional(),
+      exclude: z.string().optional(),
+      fields: z.string().optional(),
+      include: z.string().optional(),
+    },
+  },
+  run({ workspace, repository, page, pagelen, q, sort, exclude, fields, include }) {
+    // Get the commits
+    commits := @bitbucket.repositories
+      |> .listCommits {
+        workspace,
+        repo_slug: repository,
+        page,
+        pagelen,
+        q,
+        sort,
+        exclude,
+        fields,
+        include,
+      }
+      |> await
+      |> .data
+
+    // Return the commits
+    commits
+  }
+}

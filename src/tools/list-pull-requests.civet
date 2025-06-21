@@ -2,11 +2,11 @@
 
 { BitbucketToolDeclaration } from ../bitbucket.civet
 
-export getPullRequestsTool := new BitbucketToolDeclaration {
-  name: "get-pull-requests",
+export listPullRequestsTool := new BitbucketToolDeclaration {
+  name: "list-pull-requests",
   config: {
-    title: "Get pull requests",
-    description: "Get all pull requests",
+    title: "List pull requests",
+    description: "List pull requests",
     inputSchema: {
       workspace: z.string(),
       repository: z.string(),
@@ -20,8 +20,8 @@ export getPullRequestsTool := new BitbucketToolDeclaration {
   },
   run({ workspace, repository, fields, page, pagelen, q, sort, state }) {
     // Get the paginated pull requests
-    pullRequests := @bitbucket.repositories
-      |> .listPullRequests {
+    pullRequests := @bitbucket.pullrequests
+      |> .list {
         workspace,
         repo_slug: repository,
         fields,

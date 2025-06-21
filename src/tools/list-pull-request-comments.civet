@@ -1,0 +1,40 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export listPullRequestCommentsTool := new BitbucketToolDeclaration {
+  name: "list-pull-request-comments",
+  config: {
+    title: "List pull request comments",
+    description: "List pull request comments",
+    inputSchema: {
+      workspace: z.string(),
+      repository: z.string(),
+      pullRequestId: z.number(),
+      page: z.string().optional(),
+      pagelen: z.number().optional(),
+      q: z.string().optional(),
+      sort: z.string().optional(),
+      fields: z.string().optional(),
+    },
+  },
+  run({ workspace, repository, pullRequestId, page, pagelen, q, sort, fields }) {
+    // Get the comment
+    comments := @bitbucket.pullrequests
+      |> .listComments {
+        pull_request_id: pullRequestId,
+        repo_slug: repository,
+        page,
+        pagelen,
+        q,
+        sort,
+        workspace,
+        fields,
+      }
+      |> await
+      |> .data
+
+    // Return the comments
+    comments
+  }
+}

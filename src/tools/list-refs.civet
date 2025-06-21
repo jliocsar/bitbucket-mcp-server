@@ -1,0 +1,38 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export listRefsTool := new BitbucketToolDeclaration {
+  name: "list-refs",
+  config: {
+    title: "List refs",
+    description: "List refs",
+    inputSchema: {
+      workspace: z.string(),
+      repository: z.string(),
+      page: z.string().optional(),
+      pagelen: z.number().optional(),
+      q: z.string().optional(),
+      sort: z.string().optional(),
+      fields: z.string().optional(),
+    },
+  },
+  run({ workspace, repository, page, pagelen, q, sort, fields }) {
+    // Get the refs
+    refs := @bitbucket.repositories
+      |> .listRefs {
+        workspace,
+        repo_slug: repository,
+        page,
+        pagelen,
+        q,
+        sort,
+        fields,
+      }
+      |> await
+      |> .data
+
+    // Return the refs
+    refs
+  }
+}
