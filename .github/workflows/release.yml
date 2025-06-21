@@ -1,23 +1,31 @@
 name: release
+
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - "*.*.*"
+
 jobs:
-  test:
-    name: Test
+  release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-      - run: bun install && bun run test
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-      - run: bun install && bun run build && ls ${{ github.workspace }}
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Install dependencies
+        run: bun install
+      - name: Build
+        run: bun run build
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          generate_release_notes: true
+          files: |
+            dist/bitbucket-mcp-server-darwin-arm64.tar.gzz
+            dist/bitbucket-mcp-server-darwin-x64.tar.gz
+            dist/bitbucket-mcp-server-linux-arm64.tar.gz
+            dist/bitbucket-mcp-server-linux-x64.tar.gz
+            dist/bitbucket-mcp-server-windows-x64.tar.gz
