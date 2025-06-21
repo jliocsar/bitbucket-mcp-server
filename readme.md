@@ -1,12 +1,18 @@
 # 🌬️ bitbucket-mcp-server
 
-Simple MCP implementation for Bitbucket pull requests.
+Simple MCP implementation for (mostly) pull requests on Bitbucket.
 
 Provide context from your PRs to your favorite LLM and let it review them for you!
 
-Written in Bun and Civet.
+Written in Bun and Civet using Cursor.
 
-> 🚧 This repository is above all a MCP learning exercise and it is still work in progress. The API lacks many features as of now, working mostly for basic PR reviews based on the code diff. More features might be added in the near future. 🚧
+Read the documentation [here](docs.md).
+
+> 🚧 This repository is a MCP learning exercise and it is still work in progress.
+>
+> The API here lacks many features as of now. More features might be added in the near future.
+>
+> Also, the documentation was written by Cursor itself. Don't expect it to be perfect. 🚧
 
 ## Install
 
@@ -85,11 +91,12 @@ Then follow the same steps from the [Release](#release) option to add the MCP se
 
 ## Development
 
-Make sure you have `bun` installed.
+Make sure you have both Bun's runtime and Civet's VSCode/Cursor extension installed.
 
-Then after cloning the repository and `cd`ing into it:
+Then after cloning the repository, install its dependencies:
 
 ```sh
+cd /path/to/repository
 bun i
 ```
 
