@@ -3,7 +3,4 @@ description: Common setup steps for bun
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-      shell: bash
     - uses: oven-sh/setup-bun@v2
-      shell: bash 
