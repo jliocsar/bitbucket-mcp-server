@@ -14,12 +14,12 @@ First clone this repository somewhere you'd like.
 
 Then there are 2 ways to run it locally:
 
-- If you have Linux, you can run via the binary available in this repository [Releases][bitbucket-mcp-server-releases];
+- If you want to download and use the release version, you can run via the binary available in this repository [Releases][bitbucket-mcp-server-releases];
 - Otherwise, you'll have to either build from scratch, or install Bun and run the `index.civet` file directly.
 
 ### Release
 
-If you're running on Linux, go to the [Releases][bitbucket-mcp-server-releases] page and get the latest release from there.
+To run from the pre-built binaries, go to the [Releases][bitbucket-mcp-server-releases] page and get the latest release from there.
 
 Then, add this to your MCP servers settings:
 
@@ -40,9 +40,7 @@ This is enough to get the server going.
 
 ### Bun/Build
 
-If you're on Windows or macOS, you'll have to either build the app from scratch or run it directly via Bun.
-
-First you will need `bun` installed locally:
+If you want to run with Bun (or build with it), you'll first need to install `bun` by running:
 
 ```sh
 curl -fsSL https://bun.sh/install | bash
@@ -105,7 +103,6 @@ This will open the MCP Inspector with a GUI to play around and explore the MCP t
 
 ## To do
 
-- Write more tools (like for PR comments etc.)
 - Write docs on the available tools
 - Decrease built binary file size
 - Github action for build and tests
