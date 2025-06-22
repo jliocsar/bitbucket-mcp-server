@@ -8,5 +8,5 @@ export bitbucket := new Bitbucket {
 }
 
 export class BitbucketToolDeclaration<TConfig < ToolDeclarationConfig> < ToolDeclaration<TConfig, typeof BitbucketToolDeclaration> {
-  readonly bitbucket = bitbucket
+  bitbucket := bitbucket
 }

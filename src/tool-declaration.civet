@@ -6,12 +6,8 @@ type { RequestHandlerExtra } from @modelcontextprotocol/sdk/shared/protocol.js
 // Translates the input/output schema to a basic object type
 // Apparently Zod didn't have this feature, so I wrote this basic implementation
 // Maybe I should just use the `zod-to-json-schema` package? Not sure...
-export TInferedSchema<T> ::= {
-  [K in keyof T]: T[K] < ZodType ? z.infer<T[K]> : never
-}
-export TSerializable<T> ::= {
-  [K in keyof T]: Primitive | TSerializable<T[K]> | TSerializable<T[K]>[]
-}
+export TInferedSchema<T> ::= [K in keyof T]: T[K] < ZodType ? z.infer<T[K]> : never
+export TSerializable<T> ::= [K in keyof T]: Primitive | TSerializable<T[K]> | TSerializable<T[K]>[]
 
 export ToolDeclarationConfig ::= {
   title: string
