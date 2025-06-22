@@ -114,11 +114,6 @@ bun inspect username:password
 
 This will open the MCP Inspector with a GUI to play around and explore the MCP tools.
 
-## To do
-
-- Decrease built binary file size
-- Github action for build and tests
-
 ---
 
 This project was created using `bun init` in bun v1.2.17. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
