@@ -120,6 +120,10 @@ MCP has a limitation of 40 tools that will be sent to the agent.
 
 Currently `bitbucket-mcp-server` provides 24 tools total. Consider disabling the ones you don't use often to save some slots.
 
+## To do
+
+- Implement proper auth (to remove the username:password basic auth)
+
 ---
 
 This project was created using `bun init` in bun v1.2.17. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
