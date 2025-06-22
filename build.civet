@@ -55,5 +55,6 @@ await Promise.all targets.map (target) -> {
     console.info `Built for ${target}`
   } catch error {
     console.error `Error building for ${target}: ${error}`
+    process.exit 1
   }
 }
