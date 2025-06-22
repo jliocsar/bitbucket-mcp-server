@@ -1,5 +1,6 @@
 { $ } from bun
 fs from node:fs
+{ exit } from node:process
 
 * as tar from tar
 
@@ -55,6 +56,6 @@ await Promise.all targets.map (target) -> {
     console.info `Built for ${target}`
   } catch error {
     console.error `Error building for ${target}: ${error}`
-    process.exit 1
+    exit 1
   }
 }

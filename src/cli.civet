@@ -26,4 +26,4 @@ unless username and password {
   exit 1
 }
 
-export getAuth := () -> ({ username, password })
+export getAuth := -> ({ username, password })
