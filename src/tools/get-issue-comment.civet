@@ -1,0 +1,34 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export getIssueCommentTool := new BitbucketToolDeclaration {
+  name: "get-issue-comment",
+  config: {
+    title: "Get issue comment",
+    description: "Get detailed information about a specific comment on an issue.",
+    inputSchema: {
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID containing the issue"),
+      issueId: z.string().describe("The unique identifier of the issue containing the comment"),
+      commentId: z.number().describe("The unique identifier of the specific comment to retrieve"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
+    },
+  },
+  run({ workspace, repository, issueId, commentId, fields }) {
+    // Get the issue comment
+    comment := @bitbucket.repositories
+      |> .getIssueComment {
+        workspace,
+        repo_slug: repository,
+        issue_id: issueId,
+        comment_id: commentId,
+        fields
+      }
+      |> await
+      |> .data
+
+    // Return the comment
+    comment
+  }
+} 

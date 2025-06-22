@@ -8,11 +8,11 @@ export getPullRequestTaskTool := new BitbucketToolDeclaration {
     title: "Get pull request task",
     description: "Get a pull request task",
     inputSchema: {
-      workspace: z.string(),
-      repository: z.string(),
-      pullRequestId: z.number(),
-      taskId: z.number(),
-      fields: z.string().optional(),
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID containing the pull request"),
+      pullRequestId: z.number().describe("The unique identifier of the pull request containing the task"),
+      taskId: z.number().describe("The unique identifier of the specific task to retrieve"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
     },
   },
   run({ workspace, repository, pullRequestId, taskId, fields }) {

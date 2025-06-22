@@ -1,0 +1,40 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export readSourceRootTool := new BitbucketToolDeclaration {
+  name: "read-source-root",
+  config: {
+    title: "Read source root",
+    description: "Read source root",
+    inputSchema: {
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID to read the root directory from"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
+      format: z.enum(["meta"]).optional().describe("Response format: only 'meta' is supported for root directory listings"),
+      page: z.string().optional().describe("Page token for pagination when the root directory has many files"),
+      pagelen: z.number().optional().describe("Number of items to return per page when listing root directory contents"),
+      q: z.string().optional().describe("Query string to filter files in the root directory"),
+      sort: z.string().optional().describe("Field to sort results by when listing root directory contents"),
+    },
+  },
+  run({ workspace, repository, fields, format, page, pagelen, q, sort }) {
+    // Get the source
+    source := @bitbucket.source
+      |> .readRoot {
+        repo_slug: repository,
+        fields,
+        workspace,
+        format,
+        page,
+        pagelen,
+        q,
+        sort,
+      }
+      |> await
+      |> .data
+
+    // Return the refs
+    source
+  }
+}

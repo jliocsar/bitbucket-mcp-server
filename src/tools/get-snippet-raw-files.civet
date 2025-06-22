@@ -8,10 +8,10 @@ export getSnippetRawFilesTool := new BitbucketToolDeclaration {
     title: "Get snippet raw files",
     description: "Get raw files",
     inputSchema: {
-      workspace: z.string(),
-      fields: z.string().optional(),
-      encodedId: z.string(),
-      path: z.string(),
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the snippet is located"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
+      encodedId: z.string().describe("The encoded identifier of the snippet"),
+      path: z.string().describe("The specific file path within the snippet to retrieve"),
     },
   },
   run({ workspace, fields, encodedId, path }) {

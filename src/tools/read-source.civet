@@ -1,0 +1,46 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export readSourceTool := new BitbucketToolDeclaration {
+  name: "read-source",
+  config: {
+    title: "Read source",
+    description: "Read source",
+    inputSchema: {
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID containing the source files"),
+      commit: z.string().describe("The commit SHA, branch name, or tag to read the source from"),
+      path: z.string().describe("The file or directory path within the repository to read"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
+      format: z.enum(["meta", "rendered"]).optional().describe("Response format: 'meta' for metadata or 'rendered' for processed content"),
+      maxDepth: z.number().optional().describe("Maximum depth for directory traversal when reading directories"),
+      page: z.string().optional().describe("Page token for pagination when reading large directories"),
+      pagelen: z.number().optional().describe("Number of items to return per page when reading directories"),
+      q: z.string().optional().describe("Query string to filter files when reading directories"),
+      sort: z.string().optional().describe("Field to sort results by when reading directories"),
+    },
+  },
+  run({ workspace, repository, commit, path, fields, format, maxDepth, page, pagelen, q, sort }) {
+    // Get the source
+    source := @bitbucket.source
+      |> .read {
+        commit,
+        path,
+        repo_slug: repository,
+        workspace,
+        fields,
+        format,
+        max_depth: maxDepth,
+        page,
+        pagelen,
+        q,
+        sort
+      }
+      |> await
+      |> .data
+
+    // Return the refs
+    source
+  }
+}

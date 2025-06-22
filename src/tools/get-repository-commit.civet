@@ -8,9 +8,9 @@ export getRepositoryCommitTool := new BitbucketToolDeclaration {
     title: "Get repository commit",
     description: "Get a repository commit",
     inputSchema: {
-      workspace: z.string(),
-      repository: z.string(),
-      commit: z.string(),
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID containing the commit"),
+      commit: z.string().describe("The SHA hash of the commit to retrieve"),
     },
   },
   run({ workspace, repository, commit }) {

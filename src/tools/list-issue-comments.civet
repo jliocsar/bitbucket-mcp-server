@@ -1,0 +1,40 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export listIssueCommentsTool := new BitbucketToolDeclaration {
+  name: "list-issue-comments",
+  config: {
+    title: "List issue comments",
+    description: "List all comments on a specific issue. Useful for following issue discussions and tracking feedback.",
+    inputSchema: {
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID containing the issue"),
+      issueId: z.string().describe("The unique identifier of the issue to list comments from"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
+      page: z.string().optional().describe("Page token for pagination"),
+      pagelen: z.number().optional().describe("Number of items to return per page (default: 10, max: 100)"),
+      q: z.string().optional().describe("Query string to filter comments"),
+      sort: z.string().optional().describe("Field to sort results by (e.g., \"created_on\", \"-created_on\")"),
+    },
+  },
+  run({ workspace, repository, issueId, fields, page, pagelen, q, sort }) {
+    // Get the issue comments
+    comments := @bitbucket.repositories
+      |> .listIssueComments {
+        workspace,
+        repo_slug: repository,
+        issue_id: issueId,
+        fields,
+        page,
+        pagelen,
+        q,
+        sort
+      }
+      |> await
+      |> .data
+
+    // Return the comments
+    comments
+  }
+} 

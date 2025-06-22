@@ -8,10 +8,10 @@ export getPullRequestDiffTool := new BitbucketToolDeclaration {
     title: "Get pull request diff",
     description: "Get a pull request diff",
     inputSchema: {
-      pullRequestId: z.number(),
-      repository: z.string(),
-      workspace: z.string(),
-      fields: z.string().optional(),
+      pullRequestId: z.number().describe("The unique identifier of the pull request to get the diff for"),
+      repository: z.string().describe("The repository name or UUID containing the pull request"),
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
     },
   },
   run({ pullRequestId, repository, workspace, fields }) {

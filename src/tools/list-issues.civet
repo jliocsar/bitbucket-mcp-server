@@ -2,39 +2,37 @@
 
 { BitbucketToolDeclaration } from ../bitbucket.civet
 
-export listPullRequestsTool := new BitbucketToolDeclaration {
-  name: "list-pull-requests",
+export listIssuesTool := new BitbucketToolDeclaration {
+  name: "list-issues",
   config: {
-    title: "List pull requests",
-    description: "List pull requests",
+    title: "List issues",
+    description: "List issues from a repository. Essential for project management and tracking bugs, features, and tasks.",
     inputSchema: {
       workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
-      repository: z.string().describe("The repository name or UUID to list pull requests from"),
+      repository: z.string().describe("The repository name or UUID to list issues from"),
       fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
       page: z.string().optional().describe("Page token for pagination"),
       pagelen: z.number().optional().describe("Number of items to return per page (default: 10, max: 100)"),
-      q: z.string().optional().describe("Query string to filter pull requests"),
+      q: z.string().optional().describe("Query string to filter issues"),
       sort: z.string().optional().describe("Field to sort results by (e.g., \"created_on\", \"-created_on\", \"updated_on\")"),
-      state: z.enum(["OPEN", "MERGED", "DECLINED"]).optional().describe("Filter by pull request state: \"OPEN\", \"MERGED\", \"DECLINED\"")
     },
   },
-  run({ workspace, repository, fields, page, pagelen, q, sort, state }) {
-    // Get the paginated pull requests
-    pullRequests := @bitbucket.pullrequests
-      |> .list {
+  run({ workspace, repository, fields, page, pagelen, q, sort }) {
+    // Get the issues
+    issues := @bitbucket.repositories
+      |> .listIssues {
         workspace,
         repo_slug: repository,
         fields,
         page,
         pagelen,
         q,
-        sort,
-        state,
+        sort
       }
       |> await
       |> .data
 
-    // Return the pull requests
-    pullRequests
+    // Return the issues
+    issues
   }
-}
+} 

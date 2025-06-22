@@ -8,11 +8,11 @@ export getPullRequestCommentTool := new BitbucketToolDeclaration {
     title: "Get pull request comment",
     description: "Get a pull request comment",
     inputSchema: {
-      workspace: z.string(),
-      repository: z.string(),
-      pullRequestId: z.number(),
-      commentId: z.number(),
-      fields: z.string().optional(),
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID containing the pull request"),
+      pullRequestId: z.number().describe("The unique identifier of the pull request containing the comment"),
+      commentId: z.number().describe("The unique identifier of the specific comment to retrieve"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
     },
   },
   run({ workspace, repository, pullRequestId, commentId, fields }) {

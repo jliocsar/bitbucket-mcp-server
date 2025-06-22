@@ -1,0 +1,30 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export searchCodeTool := new BitbucketToolDeclaration {
+  name: "search-code",
+  config: {
+    title: "Search code",
+    description: "Search for code patterns across repositories. Use this to find specific code patterns, imports, function calls, or any text within source files.",
+    inputSchema: {
+      selectedUser: z.string().describe("The Bitbucket username to search code for"),
+      searchQuery: z.string().describe("The search query to find in code. Supports text patterns, file paths, and code constructs."),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
+    },
+  },
+  run({ selectedUser, searchQuery, fields }) {
+    // Search code in workspace
+    results := @bitbucket.search
+      |> .codeOfUser {
+        selected_user: selectedUser,
+        search_query: searchQuery,
+        fields,
+      }
+      |> await
+      |> .data
+
+    // Return the search results
+    results
+  }
+} 

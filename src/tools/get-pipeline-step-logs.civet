@@ -1,0 +1,34 @@
+{ z } from zod
+
+{ BitbucketToolDeclaration } from ../bitbucket.civet
+
+export getPipelineStepLogsTool := new BitbucketToolDeclaration {
+  name: "get-pipeline-step-logs",
+  config: {
+    title: "Get pipeline step logs",
+    description: "Get the execution logs for a specific pipeline step. Essential for debugging failed builds and understanding execution details.",
+    inputSchema: {
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID containing the pipeline"),
+      pipelineUuid: z.string().describe("The unique identifier (UUID) of the pipeline containing the step"),
+      stepUuid: z.string().describe("The unique identifier (UUID) of the step to get logs for"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
+    },
+  },
+  run({ workspace, repository, pipelineUuid, stepUuid, fields }) {
+    // Get the pipeline step logs
+    logs := @bitbucket.repositories
+      |> .getPipelineStepLog {
+        workspace,
+        repo_slug: repository,
+        pipeline_uuid: pipelineUuid,
+        step_uuid: stepUuid,
+        fields
+      }
+      |> await
+      |> .data
+
+    // Return the logs
+    logs
+  }
+} 

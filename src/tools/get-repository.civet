@@ -8,9 +8,9 @@ export getRepositoryTool := new BitbucketToolDeclaration {
     title: "Get repository",
     description: "Get a repository",
     inputSchema: {
-      workspace: z.string(),
-      repository: z.string(),
-      fields: z.string().optional(),
+      workspace: z.string().describe("The Bitbucket workspace name or UUID where the repository is located"),
+      repository: z.string().describe("The repository name or UUID to retrieve information about"),
+      fields: z.string().optional().describe("Comma-separated list of fields to include in the response"),
     },
   },
   run({ workspace, repository, fields }) {
