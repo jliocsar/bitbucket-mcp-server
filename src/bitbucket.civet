@@ -7,6 +7,6 @@ export bitbucket := new Bitbucket {
   auth: getAuth()
 }
 
-export class BitbucketToolDeclaration<TConfig extends ToolDeclarationConfig> extends ToolDeclaration<TConfig, typeof BitbucketToolDeclaration> {
+export class BitbucketToolDeclaration<TConfig < ToolDeclarationConfig> < ToolDeclaration<TConfig, typeof BitbucketToolDeclaration> {
   readonly bitbucket = bitbucket
 }

@@ -7,7 +7,7 @@ type { RequestHandlerExtra } from @modelcontextprotocol/sdk/shared/protocol.js
 // Apparently Zod didn't have this feature, so I wrote this basic implementation
 // Maybe I should just use the `zod-to-json-schema` package? Not sure...
 export TInferedSchema<T> ::= {
-  [K in keyof T]: T[K] extends ZodType ? z.infer<T[K]> : never
+  [K in keyof T]: T[K] < ZodType ? z.infer<T[K]> : never
 }
 export TSerializable<T> ::= {
   [K in keyof T]: Primitive | TSerializable<T[K]> | TSerializable<T[K]>[]
@@ -16,21 +16,21 @@ export TSerializable<T> ::= {
 export ToolDeclarationConfig ::= {
   title: string
   description: string
-  inputSchema: ZodRawShape extends infer TInputSchema ? TInputSchema : never
-  outputSchema?: ZodRawShape extends infer TOutputSchema ? TOutputSchema : never
+  inputSchema: ZodRawShape < infer TInputSchema ? TInputSchema : never
+  outputSchema?: ZodRawShape < infer TOutputSchema ? TOutputSchema : never
   annotations?: ToolAnnotations
 }
 
-export ToolDeclarationRunCallback<TConfig extends ToolDeclarationConfig = ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any = new () => any> ::=
+export ToolDeclarationRunCallback<TConfig < ToolDeclarationConfig = ToolDeclarationConfig, TConstructor < new (...args: any[]) => any = new () => any> ::=
   (
     @: ToolDeclaration<TConfig, TConstructor> & InstanceType<TConstructor>,
-    args: TInferedSchema<TConfig["inputSchema"] extends infer TInputSchema ? TInputSchema : never>,
+    args: TInferedSchema<TConfig["inputSchema"] < infer TInputSchema ? TInputSchema : never>,
     extra: RequestHandlerExtra<ServerRequest, ServerNotification>
   ) -> Promise<
     TSerializable<TInferedSchema<TConfig["outputSchema"]>> | TSerializable<TInferedSchema<TConfig["outputSchema"]>>[] | null
   >
 
-export ToolDeclarationArgs<TConfig extends ToolDeclarationConfig = ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any = new () => any> ::= {
+export ToolDeclarationArgs<TConfig < ToolDeclarationConfig = ToolDeclarationConfig, TConstructor < new (...args: any[]) => any = new () => any> ::= {
   name: string
   config: TConfig
   run: ToolDeclarationRunCallback<TConfig, TConstructor>
@@ -39,7 +39,7 @@ export ToolDeclarationArgs<TConfig extends ToolDeclarationConfig = ToolDeclarati
 // Wraps the tool declaration in a class to make it easier to use
 // For now some of the stuff is injected directly into this class (like `bitbucket`), but that
 // could change to be injected into the `run` function instead or something of the sort
-export class ToolDeclaration<TConfig extends ToolDeclarationConfig = ToolDeclarationConfig, TConstructor extends new (...args: any[]) => any = new () => any> {
+export class ToolDeclaration<TConfig < ToolDeclarationConfig = ToolDeclarationConfig, TConstructor < new (...args: any[]) => any = new () => any> {
   public readonly name: string
   public readonly config: TConfig
   public readonly run: ToolDeclarationRunCallback<TConfig, TConstructor>
@@ -51,7 +51,7 @@ export class ToolDeclaration<TConfig extends ToolDeclarationConfig = ToolDeclara
   }
 }
 
-safeActionCallToOutput := <T extends ToolDeclaration>(member: T) ->
+safeActionCallToOutput := <T < ToolDeclaration>(member: T) ->
   (...args: Parameters<ToolDeclarationRunCallback>) ->
     content: []
       type: "text",
@@ -64,7 +64,7 @@ safeActionCallToOutput := <T extends ToolDeclaration>(member: T) ->
 
 // All tools are loaded via a glob scan, so we can just iterate over the files and import them
 // This means to create new tools you just need to create a new file in `src/tools`
-export registerTools := <TConfig extends ToolDeclarationConfig, T extends ToolDeclaration<TConfig>>(tools: Record<string, T>) -> (server: McpServer) -> {
+export registerTools := <TConfig < ToolDeclarationConfig, T < ToolDeclaration<TConfig>>(tools: Record<string, T>) -> (server: McpServer) -> {
   // Register tools based on the glob pattern
   for await member of Object.values tools {
     // For each exported member, if it's a tool declaration, register it with the server
