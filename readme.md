@@ -8,7 +8,7 @@ Simple MCP implementation for (mostly) pull requests on Bitbucket.
 
 Provide context from your PRs to your favorite LLM and let it review them for you!
 
-Written in Bun and Civet using Cursor.
+Written in Bun and Civet using Cursor as an assistant.
 
 Read the documentation [here](docs.md).
 
