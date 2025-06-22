@@ -10,11 +10,11 @@ export TInferedSchema<T> ::= [K in keyof T]: T[K] < ZodType ? z.infer<T[K]> : ne
 export TSerializable<T> ::= [K in keyof T]: Primitive | TSerializable<T[K]> | TSerializable<T[K]>[]
 
 export ToolDeclarationConfig ::= {
-  title: string
-  description: string
   inputSchema: ZodRawShape < infer TInputSchema ? TInputSchema : never
   outputSchema?: ZodRawShape < infer TOutputSchema ? TOutputSchema : never
   annotations?: ToolAnnotations
+  title: string
+  description: string
 }
 
 export ToolDeclarationRunCallback<TConfig < ToolDeclarationConfig = ToolDeclarationConfig, TConstructor < new (...args: any[]) => any = new () => any> ::=
@@ -27,23 +27,23 @@ export ToolDeclarationRunCallback<TConfig < ToolDeclarationConfig = ToolDeclarat
   >
 
 export ToolDeclarationArgs<TConfig < ToolDeclarationConfig = ToolDeclarationConfig, TConstructor < new (...args: any[]) => any = new () => any> ::= {
-  name: string
   config: TConfig
   run: ToolDeclarationRunCallback<TConfig, TConstructor>
+  name: string
 }
 
 // Wraps the tool declaration in a class to make it easier to use
 // For now some of the stuff is injected directly into this class (like `bitbucket`), but that
 // could change to be injected into the `run` function instead or something of the sort
 export class ToolDeclaration<TConfig < ToolDeclarationConfig = ToolDeclarationConfig, TConstructor < new (...args: any[]) => any = new () => any> {
-  public readonly name: string
   public readonly config: TConfig
   public readonly run: ToolDeclarationRunCallback<TConfig, TConstructor>
+  public readonly name: string
 
   @(args: ToolDeclarationArgs<TConfig, TConstructor>) {
-    @name = args.name
     @config = args.config
     @run = args.run.bind(@ as any)
+    @name = args.name
   }
 }
 
