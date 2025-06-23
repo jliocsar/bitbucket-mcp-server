@@ -14,10 +14,9 @@ targets :=
 outputDir := './dist'
 
 // Transpile all Civet source files to JS
-await Promise.all [
-  $`civet --js -c src/*.civet -o ./dist/.js`
-  $`civet --js -c src/tools/*.civet -o ./dist/tools/.js`
-]
+await Promise.all
+  . $`civet --js -c src/*.civet -o ./dist/.js`
+  . $`civet --js -c src/tools/*.civet -o ./dist/tools/.js`
 
 // Create the output directory if it doesn't exist
 unless fs.existsSync outputDir {

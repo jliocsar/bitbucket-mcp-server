@@ -4,7 +4,6 @@
 * as tools from ./tools/index.civet
 
 { registerTools } from ./tool-declaration.civet
-{ logger } from ./logger.civet
 
 main := -> {
   // Create server
@@ -13,6 +12,10 @@ main := -> {
     name: "bitbucket-mcp-server",
     version: "1.0.0",
     description: "Bitbucket MCP server",
+  }, {
+    capabilities: {
+      logging: {},
+    }
   }
     // Register the available tools
     |> registerTools tools
@@ -25,8 +28,6 @@ main := -> {
   transport
     |> server.connect
     |> await
-
-  logger.info "Server started"
 }
 
 main()

@@ -1,0 +1,3 @@
+{ env } from node:process
+
+export IS_DEV := env.NODE_ENV is "development"

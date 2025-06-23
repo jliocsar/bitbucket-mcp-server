@@ -3,6 +3,8 @@ type { ToolAnnotations, ServerRequest, ServerNotification } from @modelcontextpr
 type { McpServer } from @modelcontextprotocol/sdk/server/mcp.js
 type { RequestHandlerExtra } from @modelcontextprotocol/sdk/shared/protocol.js
 
+{ IS_DEV } from ./const.civet
+
 // Translates the input/output schema to a basic object type
 // Apparently Zod didn't have this feature, so I wrote this basic implementation
 // Maybe I should just use the `zod-to-json-schema` package? Not sure...
@@ -47,14 +49,38 @@ export class ToolDeclaration<TConfig < ToolDeclarationConfig = ToolDeclarationCo
   }
 }
 
-safeActionCallToOutput := <T < ToolDeclaration>(member: T) ->
-  (...args: Parameters<ToolDeclarationRunCallback>) ->
+sendNotificationFromExtra := (extra: RequestHandlerExtra<ServerRequest, ServerNotification>) ->
+  <T>(level: "error" | "warning" | "info" | "debug", data: T) ->
+    extra.sendNotification {
+      method: "notifications/message",
+      params: {
+        level,
+        data
+      }
+    }
+
+safeActionCallToOutput := <T extends ZodRawShape, TMember < ToolDeclaration>(member: TMember) ->
+  (args: TInferedSchema<T>, extra: RequestHandlerExtra<ServerRequest, ServerNotification>) ->
+    sendNotification := sendNotificationFromExtra extra
     content: []
       type: "text",
       text: (
         try
-          await member.run.apply member, args
-        catch actionError error: (actionError as Error).message
+          if IS_DEV {
+            sendNotification "debug", {
+              member.name,
+              config: {
+                member.config.title
+                member.config.description
+              }
+            }
+          }
+          await member@run args, extra
+        catch actionError
+          sendNotification "error", {
+            error: (actionError as Error).message
+          }
+          null
       )
         |> JSON.stringify
 

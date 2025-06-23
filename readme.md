@@ -122,7 +122,7 @@ Currently `bitbucket-mcp-server` provides 24 tools total. Consider disabling the
 
 ## To do
 
-- Implement proper auth (to remove the username:password basic auth)
+- _Maybe_ implement OAuth
 
 ---
 
