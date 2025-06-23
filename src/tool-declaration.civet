@@ -75,7 +75,8 @@ safeActionCallToOutput := <T extends ZodRawShape, TMember < ToolDeclaration>(mem
               }
             }
           }
-          await member@run args, extra
+          run := member@run
+          await run args, extra
         catch actionError
           sendNotification "error", {
             error: (actionError as Error).message
