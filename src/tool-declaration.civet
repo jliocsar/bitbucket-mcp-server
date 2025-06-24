@@ -6,7 +6,7 @@ type { RequestHandlerExtra } from @modelcontextprotocol/sdk/shared/protocol.js
 { IS_DEV } from ./const.civet
 
 // Translates the input/output schema to a basic object type
-// Apparently Zod didn't have this feature, so I wrote this basic implementation
+// Apparently Zod didn't have this feature
 // Maybe I should just use the `zod-to-json-schema` package? Not sure...
 export TInferedSchema<T> ::= [K in keyof T]: T[K] < ZodType ? z.infer<T[K]> : never
 export TSerializable<T> ::= [K in keyof T]: Primitive | TSerializable<T[K]> | TSerializable<T[K]>[]
@@ -59,7 +59,7 @@ sendNotificationFromExtra := (extra: RequestHandlerExtra<ServerRequest, ServerNo
       }
     }
 
-safeActionCallToOutput := <T extends ZodRawShape, TMember < ToolDeclaration>(member: TMember) ->
+safeActionCallToOutput := <T < ZodRawShape, TMember < ToolDeclaration>(member: TMember) ->
   (args: TInferedSchema<T>, extra: RequestHandlerExtra<ServerRequest, ServerNotification>) ->
     sendNotification := sendNotificationFromExtra extra
     content: []
@@ -85,8 +85,12 @@ safeActionCallToOutput := <T extends ZodRawShape, TMember < ToolDeclaration>(mem
       )
         |> JSON.stringify
 
-// All tools are loaded via a glob scan, so we can just iterate over the files and import them
-// This means to create new tools you just need to create a new file in `src/tools`
+/**
+ * Registers all tools with the server
+ * @param tools - The tools to register
+ * @param server - The server to register the tools with
+ * @returns The server with the tools registered
+ */
 export registerTools := <TConfig < ToolDeclarationConfig, T < ToolDeclaration<TConfig>>(tools: Record<string, T>) -> (server: McpServer) -> {
   // Register tools based on the glob pattern
   for await member of Object.values tools {
