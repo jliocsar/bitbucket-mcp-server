@@ -22,7 +22,7 @@ main := -> {
     |> await
 
   // Create a transport to listen for messages on stdin and send messages on stdout
-  transport := new StdioServerTransport()
+  transport := new StdioServerTransport
 
   // Start receiving messages on stdin and sending messages on stdout
   transport
