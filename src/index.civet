@@ -8,10 +8,10 @@
 main := -> {
   // Create server
   server := new McpServer {
-    title: "Bitbucket MCP Server",
-    name: "bitbucket-mcp-server",
-    version: "1.0.0",
-    description: "Bitbucket MCP server",
+    title: "Bitbucket MCP Server"
+    name: "bitbucket-mcp-server"
+    version: "1.0.0"
+    description: "Bitbucket MCP server"
   }, {
     capabilities: {
       logging: {},
