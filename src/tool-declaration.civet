@@ -6,14 +6,14 @@ type { RequestHandlerExtra } from @modelcontextprotocol/sdk/shared/protocol.js
 { IS_DEV } from ./const.civet
 
 // Translates the input/output schema to a basic object type
-// Apparently Zod didn't have this feature
+// Apparently Zod didn't have this feature (maybe it's skill issue...?)
 // Maybe I should just use the `zod-to-json-schema` package? Not sure...
-export TInferedSchema<T> ::= [K in keyof T]: T[K] < ZodType ? z.infer<T[K]> : never
+export TInferedSchema<T> ::= [K in keyof T]: if T[K] < ZodType then z.infer<T[K]> else never
 export TSerializable<T> ::= [K in keyof T]: Primitive | TSerializable<T[K]> | TSerializable<T[K]>[]
 
 export ToolDeclarationConfig ::= {
-  inputSchema: ZodRawShape < infer TInputSchema ? TInputSchema : never
-  outputSchema?: ZodRawShape < infer TOutputSchema ? TOutputSchema : never
+  inputSchema: if ZodRawShape < infer TInputSchema then TInputSchema else never
+  outputSchema?: if ZodRawShape < infer TOutputSchema then TOutputSchema else never
   annotations?: ToolAnnotations
   title: string
   description: string
@@ -22,7 +22,7 @@ export ToolDeclarationConfig ::= {
 export ToolDeclarationRunCallback<TConfig < ToolDeclarationConfig = ToolDeclarationConfig, TConstructor < new (...args: any[]) => any = new () => any> ::=
   (
     @: ToolDeclaration<TConfig, TConstructor> & InstanceType<TConstructor>,
-    args: TInferedSchema<TConfig["inputSchema"] < infer TInputSchema ? TInputSchema : never>,
+    args: TInferedSchema<if TConfig["inputSchema"] < infer TInputSchema then TInputSchema else never>,
     extra: RequestHandlerExtra<ServerRequest, ServerNotification>
   ) -> Promise<
     TSerializable<TInferedSchema<TConfig["outputSchema"]>> | TSerializable<TInferedSchema<TConfig["outputSchema"]>>[] | null
@@ -44,7 +44,7 @@ export class ToolDeclaration<TConfig < ToolDeclarationConfig = ToolDeclarationCo
 
   @(args: ToolDeclarationArgs<TConfig, TConstructor>) {
     @config = args.config
-    @run = args.run.bind(@ as any)
+    @run = args.run.bind @ as InstanceType<TConstructor>
     @name = args.name
   }
 }
@@ -105,8 +105,7 @@ export registerTools := <TConfig < ToolDeclarationConfig, T < ToolDeclaration<TC
       member.name,
       member.config,
       // Wrap the run call in a try/catch and return the result in the MCP format
-      // @ts-expect-error -- The types are all right here, but the SDK won't know that a `Promise` of the
-      // `ToolCallback` is a valid `ToolCallback` (because promises are flattened)
+      // @ts-expect-error FIXME
       safeActionCallToOutput member
     )
   }

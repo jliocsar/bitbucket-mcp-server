@@ -14,7 +14,7 @@ targets :=
 outputDir := './dist'
 
 // Transpile all Civet source files to JS
-await Promise.all
+await.all
   . $`civet --js -c src/*.civet -o ./dist/.js`
   . $`civet --js -c src/tools/*.civet -o ./dist/tools/.js`
 
@@ -24,37 +24,36 @@ unless fs.existsSync outputDir {
 }
 
 // Build the binary for each target
-await Promise.all targets.map (target) -> {
-  console.info `Building for ${target}`
+await.all
+  for target of targets
+    console.info `Building for ${target}`
 
-  // Remove the `bun-` prefix from the output filename
-  suffix := target.replace 'bun-', ''
-  outfile := `${outputDir}/bitbucket-mcp-server-${suffix}`
+    // Remove the `bun-` prefix from the output filename
+    suffix := target.replace 'bun-', ''
+    outfile := `${outputDir}/bitbucket-mcp-server-${suffix}`
 
-  // Build the binary
-  try {
-    await $`bun build \
-      --compile \
-      --minify \
-      --sourcemap \
-      --target=${target} \
-      ./dist/index.js \
-      --outfile ${outfile}`
+    // Build the binary
+    try
+      await $`bun build \
+        --compile \
+        --minify \
+        --sourcemap \
+        --target=${target} \
+        ./dist/index.js \
+        --outfile ${outfile}`
 
-    outputFileName := outfile.includes('windows') ? `${outfile}.exe` : outfile
+      outputFileName := if outfile.includes 'windows' then `${outfile}.exe` else outfile
 
-    // Create a tarball of the binary
-    await tar.create {
-      +gzip
-      file: `${outfile}.tar.gz`
-    }, [outputFileName]
+      // Create a tarball of the binary
+      await tar.create {
+        +gzip
+        file: `${outfile}.tar.gz`
+      }, [outputFileName]
 
-    // Remove the binary
-    fs.unlinkSync outputFileName
+      // Remove the binary
+      fs.unlinkSync outputFileName
 
-    console.info `Built for ${target}`
-  } catch error {
-    console.error `Error building for ${target}: ${error}`
-    exit 1
-  }
-}
+      console.info `Built for ${target}`
+    catch error
+      console.error `Error building for ${target}: ${error}`
+      exit 1
