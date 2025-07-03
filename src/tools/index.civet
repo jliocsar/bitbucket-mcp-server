@@ -20,6 +20,8 @@ export * from ./list-pipeline-steps.civet
 export * from ./list-pipelines.civet
 export * from ./list-pull-request-comments.civet
 export * from ./list-pull-request-commits.civet
+export * from ./list-pull-request-statuses.civet
+export * from ./list-pull-request-activities.civet
 export * from ./list-pull-request-tasks.civet
 export * from ./list-pull-requests.civet
 export * from ./list-refs.civet
