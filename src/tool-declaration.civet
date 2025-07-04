@@ -59,31 +59,57 @@ sendNotificationFromExtra := (extra: RequestHandlerExtra<ServerRequest, ServerNo
       }
     }
 
+Ok<T> ::= {
+  ok: true
+  data: T
+}
+
+Fail<T> ::= {
+  ok: false
+  error: T
+}
+
+serializeResult := <T>(result: Ok<T> | Fail<T>) ->
+  if result.ok {
+    JSON.stringify { ok: true, data: result.data }
+  } else {
+    JSON.stringify { ok: false, error: result.error }
+  }
+
 safeActionCallToOutput := <T < ZodRawShape, TMember < ToolDeclaration>(member: TMember) ->
-  (args: TInferedSchema<T>, extra: RequestHandlerExtra<ServerRequest, ServerNotification>) ->
+  (args: TInferedSchema<T>, extra: RequestHandlerExtra<ServerRequest, ServerNotification>) -> {
     sendNotification := sendNotificationFromExtra extra
     content: []
       type: "text",
       text: (
         try
-          if IS_DEV {
-            sendNotification "debug", {
-              member.name,
-              config: {
-                member.config.title
-                member.config.description
-              }
+          logged := {
+            member.name,
+            config: {
+              member.config.title
+              member.config.description
             }
           }
+          if IS_DEV {
+            sendNotification "debug", logged
+          }
           run := member@run
-          await run args, extra
+          result := await run args, extra
+          // We want only JSON-serializable results
+          if result is null {
+            return serializeResult { ok: false, error: "Empty result" }
+          }
+          // If it's an object (and not null), we want to return it as a JSON string
+          if typeof result is 'object' {
+            return serializeResult { ok: true, data: result }
+          }
         catch actionError
           sendNotification "error", {
             error: (actionError as Error).message
           }
-          null
+          serializeResult { ok: true, data: null }
       )
-        |> JSON.stringify
+    }
 
 /**
  * Registers all tools with the server

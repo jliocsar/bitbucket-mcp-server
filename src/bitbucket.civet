@@ -5,6 +5,7 @@
 
 export bitbucket := new Bitbucket {
   auth: getAuth()
+  -notice
 }
 
 export class BitbucketToolDeclaration<TConfig < ToolDeclarationConfig> < ToolDeclaration<TConfig, typeof BitbucketToolDeclaration> {

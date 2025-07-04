@@ -1,5 +1,6 @@
 { $ } from bun
 fs from node:fs
+{ info, warn } from node:console
 { exit } from node:process
 
 * as tar from tar
@@ -26,34 +27,51 @@ unless fs.existsSync outputDir {
 // Build the binary for each target
 await.all
   for target of targets
-    console.info `Building for ${target}`
-
     // Remove the `bun-` prefix from the output filename
     suffix := target.replace 'bun-', ''
     outfile := `${outputDir}/bitbucket-mcp-server-${suffix}`
 
     // Build the binary
     try
+      info `Building for ${target}...`
       await $`bun build \
         --compile \
         --minify \
-        --sourcemap \
         --target=${target} \
-        ./dist/index.js \
+        ${outputDir}/index.js \
         --outfile ${outfile}`
 
       outputFileName := if outfile.includes 'windows' then `${outfile}.exe` else outfile
+      tarFileName := `${outfile}.tar.gz`
 
       // Create a tarball of the binary
+      info `Creating tarball...`
       await tar.create {
         +gzip
-        file: `${outfile}.tar.gz`
+        file: tarFileName
       }, [outputFileName]
 
       // Remove the binary
       fs.unlinkSync outputFileName
 
-      console.info `Built for ${target}`
+      info `Built for ${target}`
     catch error
-      console.error `Error building for ${target}: ${error}`
+      warn `Error building for ${target}: ${error}`
       exit 1
+
+// Reads the remaining files from the directory and removes only non `.tar.gz` ones
+info 'Cleaning up...'
+fs.readdirSync outputDir
+  |> .filter (file) -> not file.endsWith '.tar.gz'
+  |> for file of & {
+    filePath := `${outputDir}/${file}`
+
+    // Handle directories
+    if filePath |> fs.statSync |> .isDirectory() {
+      fs.rmdirSync filePath, { +recursive }
+      continue
+    }
+
+    // Remove the file
+    fs.unlinkSync filePath
+  }
